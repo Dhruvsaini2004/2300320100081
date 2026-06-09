@@ -4,7 +4,8 @@
  * Finds the top n most important unread notifications.
  * Priority: placement > result > event, combined with recency.
  *
- * Usage: set ACCESS_TOKEN env var, then run with ts-node
+ * Usage: ACCESS_TOKEN=xyz npm start
+ *    or: npm start -- YOUR_TOKEN_HERE
  */
 
 const API_URL = 'http://4.224.186.213/evaluation-service/notifications';
@@ -38,16 +39,20 @@ function score(n: Notification): number {
 }
 
 async function fetchAll(): Promise<Notification[]> {
-  const token = process.env.ACCESS_TOKEN;
-  if (!token) throw new Error('ACCESS_TOKEN not set');
+  const token = process.env.ACCESS_TOKEN || process.argv[2];
+  if (!token) throw new Error('ACCESS_TOKEN not set. Pass as env var or argument: npm start -- YOUR_TOKEN');
 
   const all: Notification[] = [];
   let page = 1;
 
   while (true) {
-    const res = await fetch(`${API_URL}?limit=100&page=${page}`, {
+    const res = await fetch(`${API_URL}?limit=10&page=${page}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`API ${res.status}: ${text}`);
+    }
     const data = await res.json() as { notifications: Notification[] };
     if (!data.notifications || data.notifications.length === 0) break;
     all.push(...data.notifications);
