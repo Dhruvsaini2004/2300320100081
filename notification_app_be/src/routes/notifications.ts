@@ -1,44 +1,43 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import { Log } from 'logging-middleware';
 import { getNotifications, markAsRead, getUnreadCount, syncNotifications } from '../services/notificationService';
 
 const router = Router();
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (req, res) => {
   try {
     const result = await getNotifications(req.query);
-    Log('backend', 'info', 'route', `GET /notifications returned ${result.notifications.length} items`);
+    Log('backend', 'info', 'route', `got ${result.notifications.length} notifications`);
     res.json(result);
-  } catch (err: any) {
-    Log('backend', 'error', 'route', `GET /notifications failed: ${err.message}`);
-    res.status(500).json({ error: err.message });
+  } catch (e: any) {
+    Log('backend', 'error', 'route', `get failed: ${e.message}`);
+    res.status(500).json({ error: e.message });
   }
 });
 
-router.patch('/:id/read', async (req: Request, res: Response) => {
+router.patch('/:id/read', async (req, res) => {
   try {
-    const id = req.params.id as string;
-    const updated = await markAsRead(id);
+    const updated = await markAsRead(req.params.id);
     if (!updated) {
-      res.status(404).json({ error: 'Not found' });
+      res.status(404).json({ error: 'not found' });
       return;
     }
-    Log('backend', 'info', 'route', `PATCH /notifications/${id}/read - marked as read`);
+    Log('backend', 'info', 'route', `marked ${req.params.id} as read`);
     res.json(updated);
-  } catch (err: any) {
-    Log('backend', 'error', 'route', `PATCH failed: ${err.message}`);
-    res.status(500).json({ error: err.message });
+  } catch (e: any) {
+    Log('backend', 'error', 'route', `patch failed: ${e.message}`);
+    res.status(500).json({ error: e.message });
   }
 });
 
-router.get('/unread-count', async (_req: Request, res: Response) => {
+router.get('/unread-count', async (req, res) => {
   const count = await getUnreadCount();
   res.json({ unreadCount: count });
 });
 
-router.post('/sync', async (_req: Request, res: Response) => {
+router.post('/sync', async (req, res) => {
   await syncNotifications();
-  res.json({ message: 'Sync complete' });
+  res.json({ message: 'synced' });
 });
 
 export default router;

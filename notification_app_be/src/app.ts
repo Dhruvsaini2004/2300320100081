@@ -8,24 +8,24 @@ import { connectDB } from './config/db';
 import notificationRoutes from './routes/notifications';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-app.use((req, _res, next) => {
-  Log('backend', 'info', 'middleware', `${req.method} ${req.originalUrl}`);
+app.use((req, res, next) => {
+  Log('backend', 'info', 'middleware', `${req.method} ${req.url}`);
   next();
 });
 
 app.use('/notifications', notificationRoutes);
 
-app.get('/health', (_req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
-    Log('backend', 'info', 'middleware', `Server running on port ${PORT}`);
+  app.listen(port, () => {
+    Log('backend', 'info', 'middleware', `running on ${port}`);
   });
 });
