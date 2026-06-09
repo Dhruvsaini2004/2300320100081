@@ -24,8 +24,12 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-connectDB().then(() => {
-  app.listen(port, () => {
-    Log('backend', 'info', 'middleware', `running on ${port}`);
+import { syncNotifications } from './services/notificationService';
+
+app.listen(port, () => {
+  Log('backend', 'info', 'middleware', `running on ${port}`);
+  connectDB();
+  syncNotifications().catch((err: any) => {
+    Log('backend', 'error', 'service', `Initial startup sync failed: ${err.message}`);
   });
 });

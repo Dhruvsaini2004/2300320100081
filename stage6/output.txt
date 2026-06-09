@@ -1,0 +1,20 @@
+Fetched 3472 notifications
+
+Top 10 priority notifications:
+
+1. [Placement] Amgen Inc. hiring (9/6/2026, 7:41:59 am) score: 145.29
+2. [Placement] Microsoft Corporation hiring (9/6/2026, 7:31:11 am) score: 145.16
+3. [Placement] Apple Inc. hiring (9/6/2026, 7:20:08 am) score: 145.03
+4. [Placement] Apple Inc. hiring (9/6/2026, 7:19:36 am) score: 145.03
+5. [Placement] CSX Corporation hiring (9/6/2026, 6:58:08 am) score: 144.78
+6. [Placement] Microsoft Corporation hiring (9/6/2026, 6:42:48 am) score: 144.60
+7. [Placement] Apple Inc. hiring (9/6/2026, 6:38:01 am) score: 144.55
+8. [Placement] Marvell Technology Inc. hiring (9/6/2026, 6:28:00 am) score: 144.43
+9. [Placement] Berkshire Hathaway Inc. hiring (9/6/2026, 6:25:12 am) score: 144.40
+10. [Placement] Amgen Inc. hiring (9/6/2026, 6:11:42 am) score: 144.24
+
+--- Efficiency analysis ---
+Full sort approach: O(n log n) for all notifications
+Min-heap approach: O(log n) per new notification
+For 50k students x 5M notifications, maintaining a heap
+of top 10 means each new notification is O(1) to process.

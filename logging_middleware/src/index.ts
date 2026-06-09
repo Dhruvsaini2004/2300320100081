@@ -37,8 +37,19 @@ function validateParams(stack: Stack, level: Level, pkg: Package, message: strin
 async function Log(stack: Stack, level: Level, pkg: Package, message: string): Promise<void> {
   validateParams(stack, level, pkg, message);
 
-  const token = process.env.ACCESS_TOKEN || '';
+  let token = '';
+  if (typeof process !== 'undefined' && process.env) {
+    token = process.env.ACCESS_TOKEN || '';
+  }
+  if (!token && typeof window !== 'undefined') {
+    token = (window as any).ACCESS_TOKEN || '';
+  }
+
   if (!token) {
+    if (typeof window !== 'undefined') {
+      // In the browser, don't throw to prevent crashing the UI, just warn in console
+      return;
+    }
     throw new Error('ACCESS_TOKEN environment variable is not set');
   }
 
@@ -53,15 +64,16 @@ async function Log(stack: Stack, level: Level, pkg: Package, message: string): P
         stack,
         level,
         package: pkg,
-        message
+        message: message.substring(0, 48)
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Log API responded with status ${response.status}: ${await response.text()}`);
+      const text = await response.text();
+      console.error(`[Log] API error: ${response.status} ${text}`);
     }
   } catch (error) {
-    throw new Error(`Failed to send log: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(`[Log] Failed to send log: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 

@@ -1,0 +1,11 @@
+type Stack = 'backend' | 'frontend';
+type Level = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+declare const BACKEND_PACKAGES: readonly ["cache", "controller", "cron_job", "db", "domain", "handler", "repository", "route", "service"];
+declare const FRONTEND_PACKAGES: readonly ["api", "component", "hook", "page", "state", "style"];
+declare const SHARED_PACKAGES: readonly ["auth", "config", "middleware", "utils"];
+type BackendPackage = typeof BACKEND_PACKAGES[number];
+type FrontendPackage = typeof FRONTEND_PACKAGES[number];
+type SharedPackage = typeof SHARED_PACKAGES[number];
+type Package = BackendPackage | FrontendPackage | SharedPackage;
+declare function Log(stack: Stack, level: Level, pkg: Package, message: string): Promise<void>;
+export { Log, Stack, Level, Package, BackendPackage, FrontendPackage, SharedPackage };

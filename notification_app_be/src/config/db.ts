@@ -8,8 +8,9 @@ export async function connectDB(): Promise<void> {
     await mongoose.connect(MONGO_URI);
     Log('backend', 'info', 'db', 'Database connected');
   } catch (err: any) {
+    Log('backend', 'error', 'db', `Database connection error: ${err.message}`);
     Log('backend', 'fatal', 'db', `DB connection failed: ${err.message}`);
-    process.exit(1);
+    // Do not call process.exit(1) so the express server can still boot up on port 4000
   }
 }
 

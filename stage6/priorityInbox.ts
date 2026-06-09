@@ -46,17 +46,27 @@ async function fetchAll(): Promise<Notification[]> {
   let page = 1;
 
   while (true) {
-    const res = await fetch(`${API_URL}?limit=10&page=${page}`, {
+    const url = `${API_URL}?limit=10&page=${page}`;
+    const res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(`API ${res.status}: ${text}`);
+      throw new Error(`API ${res.status} at page ${page}: ${text}`);
     }
-    const data = await res.json() as { notifications: Notification[] };
-    if (!data.notifications || data.notifications.length === 0) break;
-    all.push(...data.notifications);
-    page++;
+    const contentType = res.headers.get('content-type') || '';
+    const text = await res.text();
+    if (!contentType.includes('application/json')) {
+      throw new Error(`Non-JSON response at page ${page} (Content-Type: ${contentType}): ${text.substring(0, 500)}`);
+    }
+    try {
+      const data = JSON.parse(text) as { notifications: Notification[] };
+      if (!data.notifications || data.notifications.length === 0) break;
+      all.push(...data.notifications);
+      page++;
+    } catch (e: any) {
+      throw new Error(`Failed to parse JSON at page ${page}: ${e.message}. Text: ${text.substring(0, 500)}`);
+    }
   }
 
   return all;
