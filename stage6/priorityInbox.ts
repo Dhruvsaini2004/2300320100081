@@ -48,7 +48,7 @@ async function fetchAll(): Promise<Notification[]> {
     const res = await fetch(`${API_URL}?limit=100&page=${page}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const data = await res.json();
+    const data = await res.json() as { notifications: Notification[] };
     if (!data.notifications || data.notifications.length === 0) break;
     all.push(...data.notifications);
     page++;
@@ -146,8 +146,6 @@ async function main() {
   console.log('of top 10 means each new notification is O(1) to process.');
 }
 
-if (require.main === module) {
-  main().catch(console.error);
-}
+main().catch(console.error);
 
 export { score, topN, maintainTopN };
